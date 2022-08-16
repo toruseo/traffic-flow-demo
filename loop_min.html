@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+    <head>
+        <title>Fundamentals of Traffic Flow: Ring road</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h1>Fundamentals of Traffic Flow: Ring road</h1>
+        <p>
+          <canvas id="main" width="800" height="320"></canvas>
+        </p>
+        <script type="text/javascript" src="util.js"></script>
+        <script type="text/javascript" src="model.js"></script>
+        <script type="text/javascript" src="mainloop.js"></script>
+        <script type="text/javascript" src="scenario_loop.js"></script>
+
+        <hr>
+        <p>
+          <h5>Number of vehicles</h5>
+          <input id="num" type="range" min="0" max="100" step="1" value="10">
+          <span id="num_value">10</span>
+          <h5>Additional information</h5>
+          <label><input id="traffic_state" type="checkbox"> Traffic state (flow, density, speed)</label><br>
+          <label><input id="flow_density" type="checkbox"> Flow-density relation</label><br>
+          <label><input id="ts_diagram_trajects" type="checkbox"> Time-space diagram of vehicle trajectories</label><br>
+          <label><input id="ts_diagram_state" type="checkbox"> Time-space diagram of traffic states: </label>
+            <label><input id="state_q" type="radio" name="ts_diagram_state_which" value="q"> flow </label>
+            <label><input id="state_k" type="radio" name="ts_diagram_state_which" value="k" checked> density </label>
+            <label><input id="state_v" type="radio" name="ts_diagram_state_which" value="v"> speed </label><br>
+          <label><input id="cumlative" type="checkbox"> Cumulative count</label>
+
+          <h5>Traffic flow model</h5>
+          <label><input id="model_newell" type="radio" name="model" value="newell" checked> Newell (Kinematic Wave Theory)</label><br>
+          <label><input id="model_nasch" type="radio" name="model" value="nasch"> Nagel-Schreckenberg</label>
+        </p>
+        <hr>
+        Copyright (c) Toru Seo. Licensed under CC-BY or MIT License
+    </body>
+</html>
