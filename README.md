@@ -19,3 +19,8 @@ Access the online versions below, or download this repo and open `bottleneck_min
 - `model.js`: code of traffic flow models etc.
 - `scenario_bottleneck.js`, `scenario_loop.js`: codes defining the scenarios
 - `util.js`: general utility
+
+## Updates
+
+- 2023-07-14: Implemented pause function
+- 2022-08-16: Initial release

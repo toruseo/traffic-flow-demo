@@ -1,27 +1,39 @@
+let isPaused = false
+
+window.onload = function() {
+    // Toggle pause when the pause button is clicked
+    document.getElementById('pauseButton').addEventListener('click', function() {
+        isPaused = !isPaused;
+    });
+};
+
 function MAINLOOP(time){
-    const elapsedTime = time - prevTime;
-    if (elapsedTime >= 1000) {
-      count = 0;
-      prevTime = time;
-    }  
-    count++;
-    //use of requestAnimationFrame: adapted from https://zenn.dev/baroqueengine/books/a19140f2d9fc1a/viewer/ebed0a
+    if (!isPaused) {
+        const elapsedTime = time - prevTime;
+        if (elapsedTime >= 1000) {
+        count = 0;
+        prevTime = time;
+        }  
+        count++;
+        //use of requestAnimationFrame: adapted from https://zenn.dev/baroqueengine/books/a19140f2d9fc1a/viewer/ebed0a
 
-    if(T%DELTAT == 0){
-        updates()
-    }
-    
-    if(T%DELTAT_DRAW == 0){
-        draws()
-    }
+        if(T%DELTAT == 0){
+            updates()
+        }
+        
+        if(T%DELTAT_DRAW == 0){
+            draws()
+        }
 
-    if(T%DELTAT_EDIE == 0){
-        edies()
+        if(T%DELTAT_EDIE == 0){
+            edies()
+        }
+        
+        T++
     }
-    
-    T++
     requestAnimationFrame(MAINLOOP);
 }
+
 
 function updates(){    
     for(let link of LINKS){
