@@ -22,5 +22,6 @@ Access the online versions below, or download this repo and open `bottleneck_min
 
 ## Updates
 
+- 2023-08-10: Increased the width of time-space diagram and cumulative plot
 - 2023-07-14: Implemented pause function
 - 2022-08-16: Initial release

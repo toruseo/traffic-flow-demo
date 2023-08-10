@@ -412,9 +412,9 @@ class QKplot{
 class TSplot{
     constructor(link){
         this.link = link
-        this.px = 200 //左下座標
+        this.px = 100 //左下座標
         this.py = 540
-        this.pxsize = 400 //横縦サイズ
+        this.pxsize = 600 //横縦サイズ
         this.pysize = 200
 
         this.deltat = Math.floor(this.pxsize/this.pysize*this.link.xmax)
@@ -567,13 +567,13 @@ class TSplot{
 class Cumplot{
     constructor(link, xs, labels, colors, shifts){
         this.link = link
-        this.px = 200 //左下座標
+        this.px = 100 //左下座標
         this.py = 810
-        this.pxsize = 400 //横縦サイズ
+        this.pxsize = 600 //横縦サイズ
         this.pysize = 200
         this.deltat = Math.floor(this.pxsize/this.pysize*this.link.xmax)
 
-        this.nsize = 120
+        this.nsize = 180
 
         this.xs = xs
         this.labels = labels
