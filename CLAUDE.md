@@ -2,7 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-ユーザーには日本語で応答して．
+## General notes
+
+ユーザーには日本語で応答する．
+
+Do not perform any Git operations. Let the user handle them.
 
 ## Project Overview
 
@@ -13,7 +17,7 @@ This is a browser-based interactive traffic flow simulator demonstrating microsc
 This is a **client-side only** JavaScript application with no build process or dependencies.
 
 To run:
-1. Open any HTML file directly in a web browser (e.g., `bottleneck_min.html`, `loop_min.html`, `bottleneck_min_lane.html`)
+1. Open any HTML file directly in a web browser (e.g., `bottleneck_min.html`, `loop_min.html`, `lane_bottleneck_min.html`)
 2. No server, build step, or package installation required
 
 ## Code Architecture
@@ -29,23 +33,23 @@ The codebase is organized into two parallel implementations:
   - `util.js` - Canvas drawing utilities (draw_rect, draw_circle, draw_line, draw_text)
 
 ### Multi-Lane Model
-- **HTML Entry**: `bottleneck_min_lane.html`
+- **HTML Entry**: `lane_bottleneck_min.html`
 - **Core Files**:
-  - `model_lane.js` - Enhanced Vehicle class with lane-changing logic and multi-lane Link class
-  - `mainloop_lane.js` - Same animation structure as single-lane
-  - `scenario_bottleneck_lane.js` - Multi-lane scenario setup
-  - `util_lane.js` - Drawing utilities for multi-lane visualization
+  - `lane_model.js` - Enhanced Vehicle class with lane-changing logic and multi-lane Link class
+  - `lane_mainloop.js` - Same animation structure as single-lane
+  - `lane_scenario_bottleneck.js` - Multi-lane scenario setup
+  - `lane_util.js` - Drawing utilities for multi-lane visualization
 
 ### Key Classes and Responsibilities
 
-**Vehicle class** (`model.js` / `model_lane.js`):
+**Vehicle class** (`model.js` / `lane_model.js`):
 - Represents individual vehicles with position (`x`), velocity (`v`), and lane (multi-lane only)
 - `speed_change()` - Implements car-following model (acceleration, deceleration, collision avoidance)
 - `move()` - Updates position and records Edie statistics (time/distance traveled)
 - `evaluateLaneChange()` - (Multi-lane) Decides target lane based on safety and speed gain
 - Each vehicle has random color and unique index for trajectory tracking
 
-**Link class** (`model.js` / `model_lane.js`):
+**Link class** (`model.js` / `lane_model.js`):
 - Represents road segments with cellular automaton grid
 - `xmax` - Length in cells
 - `delta` - Local fundamental diagram parameter array (affects following distance)
@@ -78,7 +82,7 @@ The codebase is organized into two parallel implementations:
 
 ### Animation and Update Loop
 
-The `mainloop.js` / `mainloop_lane.js` files implement a fixed time-step simulation:
+The `mainloop.js` / `lane_mainloop.js` files implement a fixed time-step simulation:
 
 - `MAINLOOP(time)` - requestAnimationFrame callback
 - `T` - Global time counter (increments every frame)
@@ -108,11 +112,11 @@ Two models are selectable via radio buttons:
 
 ### Multi-Lane Specific Features
 
-**Lane-changing logic** (`model_lane.js:evaluateLaneChange()`):
+**Lane-changing logic** (`lane_model.js:evaluateLaneChange()`):
 - Vehicles prefer left-most lane (return with 10% probability when safe)
 - Change to right lane only when current lane limits progress and gain > threshold
 - Safety checks: `lookAhead`/`lookBehind` cells must be clear
-- Parameters defined in `scenario_bottleneck_lane.js`:
+- Parameters defined in `lane_scenario_bottleneck.js`:
   - `LANE_CHANGE_LOOK_AHEAD` (default: 6 cells)
   - `LANE_CHANGE_LOOK_BEHIND` (default: 3 cells)
   - `LANE_CHANGE_MIN_GAIN` (default: 1 cell/timestep speed improvement)
@@ -121,7 +125,7 @@ Two models are selectable via radio buttons:
 
 **Desired speed distribution**:
 - Each vehicle gets random `vmax` between `V_DESIRE_MIN` and `V_DESIRE_MAX`
-- Parameters set in `scenario_bottleneck_lane.js`: `V_DESIRE_MIN=3`, `V_DESIRE_MAX=5`
+- Parameters set in `lane_scenario_bottleneck.js`: `V_DESIRE_MIN=3`, `V_DESIRE_MAX=5`
 - Creates heterogeneous traffic with faster/slower vehicles motivating lane changes
 - Falls back to `VMAX` if global params not set
 
@@ -152,7 +156,7 @@ for(let i=0; i<10; i++){
 REGULATORS.push(new Regulator(LINKS[0], VEHS.length, LINKS[0].xmax))
 ```
 
-3. **Bottleneck (multi-lane)** - `scenario_bottleneck_lane.js`:
+3. **Bottleneck (multi-lane)** - `lane_scenario_bottleneck.js`:
 ```javascript
 var NUM_LANES = 2
 LINKS.push(new Link(100, 1, 100, 50, 600, 0, NUM_LANES))
@@ -176,7 +180,7 @@ Each HTML file:
 - **Edie's definitions**: Used for calculating flow/density from individual vehicle movements
 - When modifying physics, test both Newell and Nagel-Schreckenberg modes (radio buttons in UI)
 - Multi-lane parameters can be overridden via `globalThis` (e.g., `globalThis.LANE_CHANGE_MIN_GAIN = 2`)
-- `getGlobalParam(name, fallback)` in `model_lane.js` checks `globalThis` first, then uses fallback
+- `getGlobalParam(name, fallback)` in `lane_model.js` checks `globalThis` first, then uses fallback
 
 ## File Correspondence
 
@@ -184,4 +188,4 @@ Each HTML file:
 |-----------|-------|----------|----------|----------|
 | `bottleneck_min.html` | `model.js` | `mainloop.js` | `scenario_bottleneck.js` | Single-lane bottleneck with spawner |
 | `loop_min.html` | `model.js` | `mainloop.js` | `scenario_loop.js` | Ring road with regulator |
-| `bottleneck_min_lane.html` | `model_lane.js` | `mainloop_lane.js` | `scenario_bottleneck_lane.js` | Multi-lane bottleneck with lane-changing |
+| `lane_bottleneck_min.html` | `lane_model.js` | `lane_mainloop.js` | `lane_scenario_bottleneck.js` | Multi-lane bottleneck with lane-changing |
