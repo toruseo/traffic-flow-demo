@@ -4,7 +4,7 @@ Interactive demonstration of fundamentals of traffic flow and simulation on the 
 
 ## How to use
 
-Access the online versions below, or download this repo and open `bottleneck_min.html` or other html files using a common web browser (e.g., Firefox, Chrome, Edge, Safari)
+Access the online versions below, or download this repo and open `single_bottleneck_min.html` or other html files using a common web browser (e.g., Firefox, Chrome, Edge, Safari)
 
 ## Online versions with explanations
 
@@ -14,12 +14,12 @@ Access the online versions below, or download this repo and open `bottleneck_min
 ## Files
 
 - single-lane model (Newell / Nagel-Schreckenberg)
-	- `bottleneck_min.html`: simulator for a bottleneck
-	- `loop_min.html`: simulator for a ring road
-	- `mainloop.js`: code for execution and animation
-	- `model.js`: core microscopic traffic-flow logic (car-following, plots)
-	- `scenario_bottleneck.js`: code defining the bottleneck scenario
-	- `scenario_loop.js`: code defining the ring road scenario
+	- `single_bottleneck_min.html`: simulator for a bottleneck
+	- `single_loop_min.html`: simulator for a ring road
+	- `single_mainloop.js`: code for execution and animation
+	- `single_model.js`: core microscopic traffic-flow logic (car-following, plots)
+	- `single_scenario_bottleneck.js`: code defining the bottleneck scenario
+	- `single_scenario_loop.js`: code defining the ring road scenario
 	- `util.js`: general utility
 
 - multi-lane model (Nagel-Schreckenberg with lane-changing)
@@ -27,7 +27,7 @@ Access the online versions below, or download this repo and open `bottleneck_min
 	- `lane_mainloop.js`: code for execution and animation
 	- `lane_model.js`: core microscopic traffic-flow logic (car-following, multi-lane, lane-changing, plots)
 	- `lane_scenario_bottleneck.js`: code defining the bottleneck scenario
-	- `lane_util.js`: general utility
+	- `util.js`: general utility (shared)
 
 - macro model (Cell Transmission Model)
 	- `macro_bottleneck.html`: simulator for a bottleneck using CTM

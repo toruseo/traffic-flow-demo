@@ -19,7 +19,7 @@ This is a browser-based interactive traffic flow simulator demonstrating microsc
 This is a **client-side only** JavaScript application with no build process or dependencies.
 
 To run:
-1. Open any HTML file directly in a web browser (e.g., `bottleneck_min.html`, `loop_min.html`, `lane_bottleneck_min.html`)
+1. Open any HTML file directly in a web browser (e.g., `single_bottleneck_min.html`, `single_loop_min.html`, `lane_bottleneck_min.html`)
 2. No server, build step, or package installation required
 
 ## Code Architecture
@@ -27,11 +27,11 @@ To run:
 The codebase is organized into three parallel implementations:
 
 ### Single-Lane Model (Micro/Meso)
-- **HTML Entry**: `bottleneck_min.html`, `loop_min.html`
+- **HTML Entry**: `single_bottleneck_min.html`, `single_loop_min.html`
 - **Core Files**:
-  - `model.js` - Vehicle class and Link class implementing traffic flow logic
-  - `mainloop.js` - Animation loop using requestAnimationFrame, update/draw scheduling
-  - `scenario_bottleneck.js` / `scenario_loop.js` - Scenario initialization (links, spawners, plots)
+  - `single_model.js` - Vehicle class and Link class implementing traffic flow logic
+  - `single_mainloop.js` - Animation loop using requestAnimationFrame, update/draw scheduling
+  - `single_scenario_bottleneck.js` / `single_scenario_loop.js` - Scenario initialization (links, spawners, plots)
   - `util.js` - Canvas drawing utilities (draw_rect, draw_circle, draw_line, draw_text)
 
 ### Multi-Lane Model (Micro)
@@ -40,7 +40,7 @@ The codebase is organized into three parallel implementations:
   - `lane_model.js` - Enhanced Vehicle class with lane-changing logic and multi-lane Link class
   - `lane_mainloop.js` - Same animation structure as single-lane
   - `lane_scenario_bottleneck.js` - Multi-lane scenario setup
-  - `lane_util.js` - Drawing utilities for multi-lane visualization
+  - `util.js` - Shared drawing utilities
 
 ### Macro Model (CTM)
 - **HTML Entry**: `macro_bottleneck.html`
@@ -59,14 +59,14 @@ The codebase is organized into three parallel implementations:
 
 ### Key Classes and Responsibilities
 
-**Vehicle class** (`model.js` / `lane_model.js`):
+**Vehicle class** (`single_model.js` / `lane_model.js`):
 - Represents individual vehicles with position (`x`), velocity (`v`), and lane (multi-lane only)
 - `speed_change()` - Implements car-following model (acceleration, deceleration, collision avoidance)
 - `move()` - Updates position and records Edie statistics (time/distance traveled)
 - `evaluateLaneChange()` - (Multi-lane) Decides target lane based on safety and speed gain
 - Each vehicle has random color and unique index for trajectory tracking
 
-**Link class** (`model.js` / `lane_model.js`):
+**Link class** (`single_model.js` / `lane_model.js`):
 - Represents road segments with cellular automaton grid
 - `xmax` - Length in cells
 - `delta` - Local fundamental diagram parameter array (affects following distance)
@@ -76,7 +76,7 @@ The codebase is organized into three parallel implementations:
 - Methods: `get_vehicle()`, `set_vehicle()`, `get_delta()`, `set_delta()`
 - Multi-lane: Constructor takes `lanes` parameter, methods accept `(lane, x)` or `(x, lane)` arguments
 
-**FDchanger class** (`model.js`):
+**FDchanger class** (`single_model.js`):
 - Modifies `delta` values in a range to simulate bottlenecks
 - Creates capacity reductions by increasing minimum following distance
 - Used in bottleneck scenarios only
@@ -89,7 +89,7 @@ The codebase is organized into three parallel implementations:
 **Regulator class**:
 - Controls number of vehicles in ring road scenarios
 - Adds/removes vehicles to maintain target count
-- Used in `loop_min.html` scenario only
+- Used in `single_loop_min.html` scenario only
 
 **Plot classes** (`QKplot`, `TSplot`, `Cumplot`):
 - Real-time visualization of traffic states, trajectories, and cumulative counts
@@ -113,7 +113,7 @@ The codebase is organized into three parallel implementations:
 
 ### Animation and Update Loop
 
-The `mainloop.js` / `lane_mainloop.js` files implement a fixed time-step simulation:
+The `single_mainloop.js` / `lane_mainloop.js` files implement a fixed time-step simulation:
 
 - `MAINLOOP(time)` - requestAnimationFrame callback
 - `T` - Global time counter (increments every frame)
@@ -179,14 +179,14 @@ Scenario files (`scenario_*.js`) define:
 
 **Three scenarios exist**:
 
-1. **Bottleneck (single-lane)** - `scenario_bottleneck.js`:
+1. **Bottleneck (single-lane)** - `single_scenario_bottleneck.js`:
 ```javascript
 LINKS.push(new Link(100, 1, 100, 50, 600, 0)) // length=100, delta=1, position/size, not-loop
 LINKS[0].set_delta(70, 80, 2) // cells 70-80 have delta=2 (bottleneck)
 SPAWNERS.push(new Spawner(LINKS[0], 0.1, 1)) // spawn rate controlled by slider
 ```
 
-2. **Ring road (single-lane)** - `scenario_loop.js`:
+2. **Ring road (single-lane)** - `single_scenario_loop.js`:
 ```javascript
 LINKS.push(new Link(100, 1, 100, 50, 600, 1)) // loop=1 (periodic boundary)
 // Initial vehicles created directly in VEHS array
@@ -226,8 +226,8 @@ Each HTML file:
 
 | HTML File | Model | Mainloop | Scenario | Features |
 |-----------|-------|----------|----------|----------|
-| `bottleneck_min.html` | `model.js` | `mainloop.js` | `scenario_bottleneck.js` | Single-lane bottleneck with spawner |
-| `loop_min.html` | `model.js` | `mainloop.js` | `scenario_loop.js` | Ring road with regulator |
+| `single_bottleneck_min.html` | `single_model.js` | `single_mainloop.js` | `single_scenario_bottleneck.js` | Single-lane bottleneck with spawner |
+| `single_loop_min.html` | `single_model.js` | `single_mainloop.js` | `single_scenario_loop.js` | Ring road with regulator |
 | `lane_bottleneck_min.html` | `lane_model.js` | `lane_mainloop.js` | `lane_scenario_bottleneck.js` | Multi-lane bottleneck with lane-changing |
 | `macro_bottleneck.html` | `macro_model.js` | `macro_mainloop.js` | `macro_scenario_bottleneck.js` | CTM macro model bottleneck |
 | `compare_bottleneck.html` | `lane_model.js` + `macro_model.js` | `compare_mainloop.js` | `compare_scenario.js` | 3-model comparison (Meso/Micro/Macro) |

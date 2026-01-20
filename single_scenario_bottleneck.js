@@ -1,4 +1,4 @@
-print("START");
+print("single_scenario_bottleneck.js START");
 
 var CANVAS = document.getElementById("main")
 var CTX = CANVAS.getContext("2d")
@@ -44,4 +44,4 @@ let prevTime = 0
 requestAnimationFrame(MAINLOOP);
 
 
-print("END")
+print("single_scenario_bottleneck.js END")

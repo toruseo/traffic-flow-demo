@@ -1,2 +1,5 @@
 # Claude Code
 .claude/
+
+
+*.code-workspace
