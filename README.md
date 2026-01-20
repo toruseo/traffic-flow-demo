@@ -31,7 +31,7 @@ Access the online versions below, or download this repo and open `bottleneck_min
 
 ## Updates
 
-- 2025-10-17: Added two-lane bottleneck scenario with lane-changing behavior and per-vehicle desired speeds
+- 2026-01-20: Added two-lane bottleneck scenario with lane-changing behavior and per-vehicle desired speeds
 - 2023-08-10: Increased the width of time-space diagram and cumulative plot
 - 2023-07-14: Implemented pause function
 - 2022-08-16: Initial release
