@@ -8,6 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Do not perform any Git operations. Let the user handle them.
 
+The development environment is highly likely Windows.
+
 ## Project Overview
 
 This is a browser-based interactive traffic flow simulator demonstrating microscopic traffic flow models. The project implements cellular automaton models (Newell and Nagel-Schreckenberg) for simulating vehicle behavior, bottlenecks, and traffic dynamics with real-time visualization.

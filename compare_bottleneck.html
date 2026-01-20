@@ -96,9 +96,26 @@
         <div class="canvas-label">Macro: CTM (Cell Transmission Model)</div>
         <canvas id="canvas_macro" width="800" height="120"></canvas>
         <div class="legend">
-            <span class="legend-item"><span class="legend-color" style="background: hsl(120, 100%, 50%);"></span> Free flow</span>
-            <span class="legend-item"><span class="legend-color" style="background: hsl(60, 100%, 50%);"></span> Medium</span>
-            <span class="legend-item"><span class="legend-color" style="background: hsl(0, 100%, 50%);"></span> Congested</span>
+            <div style="display: flex; align-items: flex-end; gap: 6px;">
+                <span style="font-size: 10px;">Empty</span>
+                <div style="position: relative; width: 200px;">
+                    <div style="position: absolute; left: 20%; transform: translateX(-50%); bottom: 100%; font-size: 9px; text-align: center; color: #333;">
+                        Critical density
+                    </div>
+                    <div style="width: 200px; height: 12px; border: 1px solid #999; background: linear-gradient(to right,
+                        #ffffff 0%,
+                        hsl(120, 20%, 90%) 1%,
+                        hsl(120, 80%, 50%) 20%,
+                        hsl(60, 90%, 55%) 20%,
+                        hsl(30, 95%, 50%) 60%,
+                        hsl(0, 100%, 40%) 100%);"></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 8px; color: #666; margin-top: 1px;">
+                        <span>Free flow</span>
+                        <span>Congested</span>
+                    </div>
+                </div>
+                <span style="font-size: 10px;">Jam</span>
+            </div>
         </div>
     </div>
 

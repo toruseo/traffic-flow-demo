@@ -177,18 +177,38 @@ class MacroLink {
         }
 
         // Draw density as color gradient
+        // Use global kj and kc for consistent coloring across all cells (including bottleneck)
+        let kcRatio = this.kc / this.kj  // Global critical density ratio (~0.2)
+
         for (let i = 0; i < this.xmax; i++) {
             let k = this.density[i]
-            let kjL = this.kjLocal[i]
-            let ratio = k / kjL  // 0 to 1 (normalized density)
+            let ratio = k / this.kj  // Normalize by global jam density
             if (ratio > 1) ratio = 1
-
-            // HSL: Green(120) for free flow, Yellow(60) for medium, Red(0) for congested
-            let hue = 120 - ratio * 120
-            CTX.fillStyle = `hsl(${hue}, 100%, 50%)`
 
             let cellWidth = this.plen / this.xmax
             let x = this.px + i * cellWidth
+
+            // Color scheme: White (empty) -> Light green (free flow) -> Green (at kc) -> Yellow -> Red (congested)
+            // Boundary at critical density makes free-flow vs congestion visually clear
+            if (ratio < 0.01) {
+                // Nearly empty: white
+                CTX.fillStyle = "#ffffff"
+            } else if (ratio < kcRatio) {
+                // Free flow (below critical density): very light green -> green
+                let r = (ratio - 0.01) / (kcRatio - 0.01)
+                let hue = 120  // green
+                let saturation = 20 + r * 60   // 20% -> 80%
+                let lightness = 90 - r * 40    // 90% -> 50%
+                CTX.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`
+            } else {
+                // Congested (above critical density): yellow -> orange -> red
+                let r = (ratio - kcRatio) / (1 - kcRatio)
+                let hue = 60 - r * 60  // yellow(60) -> red(0)
+                let saturation = 90 + r * 10   // 90% -> 100%
+                let lightness = 55 - r * 15    // 55% -> 40%
+                CTX.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`
+            }
+
             CTX.fillRect(x, this.py, cellWidth + 1, this.pw)  // +1 to avoid gaps
         }
 
