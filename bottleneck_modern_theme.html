@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Traffic Flow Simulator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333;
+            --border-radius: 8px;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #fff;
+            color: var(--dark-gray);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h1 {
+            color: var(--secondary-color);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: normal;
+        }
+        
+        .canvas-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 15px;
+            margin: 0 auto 25px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .control-group {
+            background-color: var(--light-gray);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        
+        h3 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin-bottom: 15px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+            height: 10px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+            background-image: linear-gradient(var(--primary-color), var(--primary-color));
+            background-repeat: no-repeat;
+            background-size: 0% 100%;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+        
+        #inflow {
+            background-size: calc(var(--inflow-value, 20) * 1%) 100%;
+        }
+        
+        input[type="checkbox"], input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        .radio-group {
+            margin: 10px 0;
+        }
+        
+        .value-display {
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            background-color: var(--primary-color);
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-left: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fundamentals of Traffic Flow</h1>
+        <p class="subtitle">Interactive simulation of traffic behavior at bottlenecks</p>
+    </header>
+    
+    <div class="canvas-container">
+        <canvas id="main" width="800" height="320"></canvas>
+    </div>
+    
+    <div class="controls">
+        <div class="control-group">
+            <button id="pauseButton" class="btn-primary">Pause / Resume</button>
+            
+            <h3>Simulation Parameters</h3>
+            <div>
+                <label for="inflow">Inflow Rate</label>
+                <input id="inflow" type="range" min="0" max="100" step="1" value="20">
+                <span id="inflow_value" class="value-display">10</span>
+            </div>
+            
+            <div>
+                <h3>Bottleneck Impact</h3>
+                <div class="radio-group">
+                    <label><input id="bn_none" type="radio" name="bn_impact" value="n"> None </label>
+                    <label><input id="bn_light" type="radio" name="bn_impact" value="l"> Light </label>
+                    <label><input id="bn_heavy" type="radio" name="bn_impact" value="h" checked> Heavy </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <h3>Visualization Options</h3>
+            <label><input id="traffic_state" type="checkbox"> Traffic state (flow, density, speed)</label>
+            <label><input id="flow_density" type="checkbox"> Flow-density plot</label>
+            <label><input id="ts_diagram_trajects" type="checkbox"> Time-space diagram of vehicle trajectories</label>
+            
+            <div>
+                <label><input id="ts_diagram_state" type="checkbox"> Time-space diagram of traffic states: </label>
+                <div class="radio-group">
+                    <label><input id="state_q" type="radio" name="ts_diagram_state_which" value="q"> Flow </label>
+                    <label><input id="state_k" type="radio" name="ts_diagram_state_which" value="k" checked> Density </label>
+                    <label><input id="state_v" type="radio" name="ts_diagram_state_which" value="v"> Speed </label>
+                </div>
+            </div>
+            
+            <label><input id="cumlative" type="checkbox"> Cumulative count</label>
+        </div>
+        
+        <div class="control-group">
+            <h3>Traffic Flow Model</h3>
+            <label><input id="model_newell" type="radio" name="model" value="newell" checked> Newell model (Kinematic Wave Theory)</label>
+            <label><input id="model_nasch" type="radio" name="model" value="nasch"> Nagel-Schreckenberg model</label>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Copyright &copy; Toru Seo. Licensed under CC-BY or MIT License</p>
+    </footer>
+    
+    <script type="text/javascript" src="util.js"></script>
+    <script type="text/javascript" src="model.js"></script>
+    <script type="text/javascript" src="mainloop.js"></script>
+    <script type="text/javascript" src="scenario_bottleneck.js"></script>
+    <script>
+        // Update slider fill when value changes
+        document.getElementById('inflow').addEventListener('input', function() {
+            const value = this.value;
+            document.documentElement.style.setProperty('--inflow-value', value);
+            
+            // This will be overwritten by the original code in mainloop.js,
+            // but lets us see the value change immediately
+            document.getElementById('inflow_value').innerHTML = (value/100).toFixed(2);
+        });
+        
+        // Set initial value
+        document.documentElement.style.setProperty('--inflow-value', document.getElementById('inflow').value);
+    </script>
+</body>
+</html>
