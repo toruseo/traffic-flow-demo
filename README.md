@@ -23,11 +23,11 @@ Access the online versions below, or download this repo and open `bottleneck_min
 	- `util.js`: general utility
 
 - multi-lane model
-	- `bottleneck_min_lane.html`: simulator for a bottleneck
-	- `mainloop_lane.js`: code for execution and animation
-	- `model_lane.js`: core microscopic traffic-flow logic (car-following, multi-lane, lane-changing, plots)
-	- `scenario_bottleneck_lane.js`: code defining the bottleneck scenario
-	- `util_lane.js`: general utility
+	- `lane_bottleneck_min.html`: simulator for a bottleneck
+	- `lane_mainloop.js`: code for execution and animation
+	- `lane_model.js`: core microscopic traffic-flow logic (car-following, multi-lane, lane-changing, plots)
+	- `lane_scenario_bottleneck.js`: code defining the bottleneck scenario
+	- `lane_util.js`: general utility
 
 ## Updates
 
