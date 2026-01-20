@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<head>
+    <title>Single-Lane vs Multi-Lane Comparison</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        .canvas-container {
+            margin: 10px 0;
+        }
+        .canvas-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            display: block;
+        }
+        .controls {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .control-row {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .control-row label {
+            min-width: 120px;
+        }
+        h1 {
+            margin-bottom: 5px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Single-Lane vs Multi-Lane Comparison</h1>
+    <p class="description">Compare traffic flow behavior between single-lane (Newell model) and multi-lane (Nagel-Schreckenberg model) simulations</p>
+
+    <div class="controls">
+        <div class="control-row">
+            <label>Inflow:</label>
+            <input id="inflow" type="range" min="0" max="100" step="1" value="20">
+            <span id="inflow_value">0.20</span>
+        </div>
+        <div class="control-row">
+            <label>Bottleneck:</label>
+            <label><input id="bn_none" type="radio" name="bn_impact" value="n"> None</label>
+            <label><input id="bn_light" type="radio" name="bn_impact" value="l"> Light</label>
+            <label><input id="bn_heavy" type="radio" name="bn_impact" value="h" checked> Heavy</label>
+        </div>
+        <div class="control-row">
+            <button id="pauseButton">Pause / Resume</button>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <div class="canvas-label">Single-Lane (Newell model: ACC=999, DECEL_PROB=0)</div>
+        <canvas id="canvas_single" width="800" height="120"></canvas>
+    </div>
+
+    <div class="canvas-container">
+        <div class="canvas-label">Multi-Lane (Nagel-Schreckenberg model: ACC=1, DECEL_PROB=0.2)</div>
+        <canvas id="canvas_multi" width="800" height="140"></canvas>
+    </div>
+
+    <script type="text/javascript" src="util.js"></script>
+    <script type="text/javascript" src="lane_model.js"></script>
+    <script type="text/javascript" src="compare_scenario.js"></script>
+    <script type="text/javascript" src="compare_mainloop.js"></script>
+
+    <hr>
+    <p>Copyright (c) Toru Seo. Licensed under CC-BY or MIT License</p>
+</body>
+</html>
