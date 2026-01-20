@@ -19,6 +19,7 @@ Access the online versions below, or download this repo and open `bottleneck_min
 	- `mainloop.js`: code for execution and animation
 	- `model.js`: core microscopic traffic-flow logic (car-following, plots)
 	- `scenario_bottleneck.js`: code defining the bottleneck scenario
+	- `scenario_loop.js`: code defining the ring road scenario
 	- `util.js`: general utility
 
 - multi-lane model
