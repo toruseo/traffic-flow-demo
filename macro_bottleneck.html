@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<head>
+    <title>CTM Macro Model - Bottleneck</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            display: block;
+            margin: 10px 0;
+        }
+        .controls {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .control-row {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .control-row label {
+            min-width: 120px;
+        }
+        .legend {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 12px;
+            margin-right: 5px;
+            border: 1px solid #999;
+        }
+    </style>
+</head>
+<body>
+    <h1>CTM Macro Model - Bottleneck</h1>
+    <p>Cell Transmission Model (CTM) - a macroscopic traffic flow model based on density propagation</p>
+
+    <div class="controls">
+        <div class="control-row">
+            <label>Inflow:</label>
+            <input id="inflow" type="range" min="0" max="100" step="1" value="20">
+            <span id="inflow_value">0.20</span>
+        </div>
+        <div class="control-row">
+            <label>Bottleneck:</label>
+            <label><input id="bn_none" type="radio" name="bn_impact" value="n"> None</label>
+            <label><input id="bn_light" type="radio" name="bn_impact" value="l"> Light</label>
+            <label><input id="bn_heavy" type="radio" name="bn_impact" value="h" checked> Heavy</label>
+        </div>
+        <div class="control-row">
+            <button id="pauseButton">Pause / Resume</button>
+        </div>
+    </div>
+
+    <canvas id="main" width="800" height="120"></canvas>
+
+    <div class="legend">
+        <span class="legend-item"><span class="legend-color" style="background: hsl(120, 100%, 50%);"></span> Free flow (low density)</span>
+        <span class="legend-item"><span class="legend-color" style="background: hsl(60, 100%, 50%);"></span> Medium density</span>
+        <span class="legend-item"><span class="legend-color" style="background: hsl(0, 100%, 50%);"></span> Congested (high density)</span>
+    </div>
+
+    <script type="text/javascript" src="util.js"></script>
+    <script type="text/javascript" src="macro_model.js"></script>
+    <script type="text/javascript" src="macro_mainloop.js"></script>
+    <script type="text/javascript" src="macro_scenario_bottleneck.js"></script>
+
+    <hr>
+    <p>Copyright (c) Toru Seo. Licensed under CC-BY or MIT License</p>
+</body>
+</html>

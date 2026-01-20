@@ -1,0 +1,193 @@
+# CTM (Cell Transmission Model) マクロモデル実装メモ
+
+## 概要
+
+CTM（Cell Transmission Model）は、Daganzo (1994) によって提案されたマクロ交通流モデル。
+密度ベースのシミュレーションで、個々の車両を追跡せず、セルごとの密度を更新する。
+
+本実装では、既存のミクロモデル（Nagel-Schreckenberg）およびメソモデル（Newell）と
+同等の交通流特性を実現するようにパラメータを調整している。
+
+## ファイル構成
+
+| ファイル | 説明 |
+|----------|------|
+| `macro_model.js` | CTMモデルクラス（MacroLink, MacroSpawner, MacroFDchanger） |
+| `macro_mainloop.js` | CTM単体用メインループ |
+| `macro_scenario_bottleneck.js` | CTM単体用シナリオ初期化 |
+| `macro_bottleneck.html` | CTM単体実行用HTML |
+
+## CTMの基本原理
+
+### 保存則
+```
+n[i](t+1) = n[i](t) + y[i](t) - y[i+1](t)
+```
+- `n[i](t)`: 時刻tにおけるセルiの車両数（密度）
+- `y[i](t)`: セル境界iを通過する流量
+
+### 流量の決定（Godunov法）
+```
+y[i](t) = min(S[i-1](t), R[i](t))
+```
+- `S[i]`: セルiからの送り出し能力（Supply/Demand）
+- `R[i]`: セルiへの受け入れ能力（Receive/Supply）
+
+### Supply と Receive
+```
+S[i] = min(k[i] * vf, qmax)      // 自由流領域では k*vf、容量制限で qmax
+R[i] = min(w * (kj - k[i]), qmax) // 渋滞領域では w*(kj-k)、容量制限で qmax
+```
+
+## 三角形Fundamental Diagram (FD)
+
+```
+q (流量)
+    |      /\
+qmax|     /  \
+    |    /    \
+    |   /      \
+    |  /        \
+    | /          \
+    |/____________\_____ k (密度)
+    0     kc      kj
+```
+
+- 自由流領域 (k < kc): `q = k * vf`
+- 渋滞領域 (k > kc): `q = w * (kj - k)`
+- 臨界密度: `kc = kj * w / (vf + w)`
+- 最大流量: `qmax = vf * kc`
+
+## パラメータ設定
+
+### ミクロモデルとの対応
+
+| パラメータ | ミクロ | マクロ | 備考 |
+|------------|--------|--------|------|
+| セル数 | 100 | 20 | マクロは1/5 |
+| セルサイズ | 1 | 5 | 5ミクロセル = 1マクロセル |
+| 自由流速度 vf | 4 セル/step | 0.8 セル/step | 4/5 = 0.8 |
+| 後退波速度 w | 1 セル/step | 0.2 セル/step | 1/5 = 0.2 |
+| ジャム密度 kj | 1 台/セル | 5 台/セル | セルサイズ分 |
+| 臨界密度 kc | - | 1 台/セル | kj * w / (vf + w) |
+| 最大流量 qmax | - | 0.8 台/step | vf * kc |
+
+### 速度の等価性
+- ミクロ: 1ステップで最大4ミクロセル進む
+- マクロ: 1ステップで最大0.8マクロセル = 0.8 × 5 = 4ミクロセル進む
+- → 同じ実効速度
+
+### CFL条件
+CTMの安定性条件: `Δx/Δt >= max(vf, w)`
+
+本実装では:
+- `Δx = 1` マクロセル
+- `Δt = 1` ステップ
+- `vf = 0.8 < 1` ✓
+- `w = 0.2 < 1` ✓
+
+## ボトルネック実装
+
+### ミクロモデルとの対応
+ミクロモデルでは `delta` パラメータで車間距離を制御:
+- `delta = 1`: 通常（1台/セル）
+- `delta = 2`: 軽度ボトルネック（0.5台/セル相当）
+- `delta = 4`: 重度ボトルネック（0.25台/セル相当）
+
+### マクロモデルでの表現
+容量とジャム密度を `1/delta` 倍に減少:
+```javascript
+set_bottleneck(x0, x1, deltaValue) {
+    let ratio = 1 / deltaValue
+    this.capacity[x] = this.qmax * ratio
+    this.kjLocal[x] = this.kj * ratio
+}
+```
+
+### ボトルネック位置
+- ミクロ: セル 70-80（100セル中）
+- マクロ: セル 14-16（20セル中）
+- 画面上の位置: 70% 地点で一致
+
+## クラス設計
+
+### MacroLink
+道路セグメントを表すクラス。
+```javascript
+class MacroLink {
+    constructor(xmax, delta, px, py, plen, loop, cellSize)
+
+    // 主要プロパティ
+    this.xmax       // セル数
+    this.cellSize   // 1マクロセル = cellSizeミクロセル
+    this.vf         // 自由流速度
+    this.w          // 後退波速度
+    this.kj         // ジャム密度
+    this.qmax       // 最大流量
+    this.density[]  // 密度配列
+    this.flow[]     // 境界流量配列
+    this.capacity[] // ボトルネック容量配列
+    this.kjLocal[]  // ローカルジャム密度配列
+
+    // メソッド
+    update()                        // CTM更新則
+    set_bottleneck(x0, x1, delta)   // ボトルネック設定
+    reset_bottleneck()              // ボトルネック解除
+    draw()                          // 描画
+}
+```
+
+### MacroSpawner
+上流境界条件を制御。
+```javascript
+class MacroSpawner {
+    constructor(link, flow, fmax)
+    update()  // 上流境界流量を設定
+    draw()    // 流入率表示
+}
+```
+
+### MacroFDchanger
+ボトルネック強度を動的に変更。
+```javascript
+class MacroFDchanger {
+    constructor(link, x0, x1)
+    this.delta  // 1, 2, or 4
+    update()    // deltaに基づいて容量を設定
+}
+```
+
+## 描画
+
+### 密度の色表示
+```javascript
+let ratio = density / kjLocal  // 正規化密度 (0-1)
+let hue = 120 - ratio * 120    // HSL色相: 緑(120) → 赤(0)
+CTX.fillStyle = `hsl(${hue}, 100%, 50%)`
+```
+
+- 緑 (hue=120): 自由流（低密度）
+- 黄 (hue=60): 中程度
+- 赤 (hue=0): 渋滞（高密度）
+
+### セル境界線
+マクロモデルらしさを強調するため、セル境界に薄いグリッド線を描画。
+
+## 3モデル比較 (compare_bottleneck.html)
+
+| モデル | 種別 | 特徴 |
+|--------|------|------|
+| Newell | メソ | 決定論的、即時加速、個体ベース |
+| NaSch | ミクロ | 確率的、段階的加速、レーン変更あり |
+| CTM | マクロ | 決定論的、密度ベース、即時定常 |
+
+同じ流入率・ボトルネック強度で:
+- Newell: すぐに定常状態に収束
+- NaSch: 確率的変動を伴いながら収束
+- CTM: 即座に定常状態に収束（連続的な密度分布）
+
+## 参考文献
+
+- Daganzo, C.F. (1994). "The cell transmission model: A dynamic representation of highway traffic consistent with the hydrodynamic theory." Transportation Research Part B, 28(4), 269-287.
+- Newell, G.F. (1993). "A simplified theory of kinematic waves in highway traffic." Transportation Research Part B, 27(4), 281-313.
+- Nagel, K., & Schreckenberg, M. (1992). "A cellular automaton model for freeway traffic." Journal de Physique I, 2(12), 2221-2229.

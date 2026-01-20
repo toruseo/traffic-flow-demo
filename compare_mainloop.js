@@ -5,9 +5,10 @@ var count = 0
 var prevTime = 0
 
 window.onload = function() {
-    // Initialize both simulations
+    // Initialize all three simulations
     initSingleLane()
     initMultiLane()
+    initMacro()
 
     // Toggle pause when the pause button is clicked
     document.getElementById('pauseButton').addEventListener('click', function() {
@@ -28,7 +29,7 @@ function MAINLOOP(time) {
         }
         count++
 
-        // Update and draw single-lane simulation (uniform speed)
+        // Update and draw single-lane simulation (Meso: Newell, uniform speed)
         globalThis.V_DESIRE_MIN = 4
         globalThis.V_DESIRE_MAX = 4
         loadContext(simSingle)
@@ -41,7 +42,7 @@ function MAINLOOP(time) {
         T++
         saveContext(simSingle)
 
-        // Update and draw multi-lane simulation (heterogeneous speeds)
+        // Update and draw multi-lane simulation (Micro: NaSch, heterogeneous speeds)
         globalThis.V_DESIRE_MIN = 3
         globalThis.V_DESIRE_MAX = 5
         loadContext(simMulti)
@@ -53,6 +54,17 @@ function MAINLOOP(time) {
         }
         T++
         saveContext(simMulti)
+
+        // Update and draw macro simulation (CTM)
+        loadContext(simMacro)
+        if (T % DELTAT == 0) {
+            updateMacro(simMacro)
+        }
+        if (T % DELTAT_DRAW == 0) {
+            drawMacro(simMacro)
+        }
+        T++
+        saveContext(simMacro)
     }
     requestAnimationFrame(MAINLOOP)
 }
@@ -128,6 +140,55 @@ function drawSim(sim) {
     // Draw vehicles
     for (let veh of VEHS) {
         veh.draw()
+    }
+
+    // Draw inflow label
+    for (let s of SPAWNERS) {
+        s.draw()
+    }
+}
+
+// Update macro (CTM) simulation
+function updateMacro(sim) {
+    // Update spawners with inflow value from slider
+    var inflowValue = Number(document.getElementById("inflow").value) / 100
+    for (let s of SPAWNERS) {
+        s.flow = inflowValue
+        s.update()
+    }
+
+    // Update FD changers based on bottleneck radio buttons
+    var bnNone = document.getElementById("bn_none")
+    if (bnNone != null) {
+        var delta = 1
+        if (document.getElementsByName("bn_impact").item(0).checked) {
+            delta = 1  // None
+        } else if (document.getElementsByName("bn_impact").item(1).checked) {
+            delta = 2  // Light
+        } else if (document.getElementsByName("bn_impact").item(2).checked) {
+            delta = 4  // Heavy
+        }
+        for (let fdc of FDCHANGERS) {
+            fdc.delta = delta
+            fdc.update()
+        }
+    }
+
+    // Update links (CTM calculation)
+    for (let link of LINKS) {
+        link.update()
+    }
+}
+
+// Draw macro (CTM) simulation
+function drawMacro(sim) {
+    // Clear canvas
+    CTX.fillStyle = "#eeeeee"
+    CTX.fillRect(0, 0, CANVAS.width, CANVAS.height)
+
+    // Draw links
+    for (let link of LINKS) {
+        link.draw()
     }
 
     // Draw inflow label

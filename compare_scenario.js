@@ -33,7 +33,7 @@ globalThis.V_DESIRE_MAX = 5
 // coef_flow for QKplot (required by lane_model.js QKplot)
 var coef_flow = 1
 
-// Single-lane simulation state
+// Single-lane simulation state (Meso: Newell model)
 var simSingle = {
     CANVAS: null,
     CTX: null,
@@ -53,7 +53,7 @@ var simSingle = {
     NUM_LANES: 1
 };
 
-// Multi-lane simulation state
+// Multi-lane simulation state (Micro: Nagel-Schreckenberg model)
 var simMulti = {
     CANVAS: null,
     CTX: null,
@@ -74,7 +74,26 @@ var simMulti = {
     INFLOW_COEF: 2   // Inflow coefficient for multi-lane (adjustable)
 };
 
-// Initialize single-lane simulation
+// Macro simulation state (CTM model)
+var simMacro = {
+    CANVAS: null,
+    CTX: null,
+    T: 0,
+    LINKS: [],
+    VEHS: [],           // CTM doesn't use individual vehicles, but keep for interface compatibility
+    SPAWNERS: [],
+    FDCHANGERS: [],
+    REGULATORS: [],
+    QKPLOTS: [],
+    TSPLOTS: [],
+    CUMPLOTS: [],
+    VEH_IDX: 0,
+    VMAX: 4,
+    ACC: 999,
+    DECEL_PROB: 0
+};
+
+// Initialize single-lane simulation (Meso: Newell)
 function initSingleLane() {
     simSingle.CANVAS = document.getElementById("canvas_single")
     simSingle.CTX = simSingle.CANVAS.getContext("2d")
@@ -96,7 +115,7 @@ function initSingleLane() {
     saveContext(simSingle)
 }
 
-// Initialize multi-lane simulation
+// Initialize multi-lane simulation (Micro: NaSch)
 function initMultiLane() {
     simMulti.CANVAS = document.getElementById("canvas_multi")
     simMulti.CTX = simMulti.CANVAS.getContext("2d")
@@ -116,6 +135,33 @@ function initMultiLane() {
     simMulti.SPAWNERS.push(new Spawner(link, 0.2, simMulti.INFLOW_COEF))
 
     saveContext(simMulti)
+}
+
+// Macro model parameters
+var MACRO_CELLS = 20      // Number of macro cells
+var MACRO_CELL_SIZE = 5   // Each macro cell = 5 micro cells
+// Total road length: 20 * 5 = 100 micro cells (same as micro model)
+// Bottleneck position: micro 70-80 -> macro 14-16
+
+// Initialize macro simulation (CTM)
+function initMacro() {
+    simMacro.CANVAS = document.getElementById("canvas_macro")
+    simMacro.CTX = simMacro.CANVAS.getContext("2d")
+
+    // Set global context
+    loadContext(simMacro)
+
+    // Create macro link (20 cells, delta=1, position 100,50, length 600, not a loop, cell size 5)
+    var link = new MacroLink(MACRO_CELLS, 1, 100, 50, 600, 0, MACRO_CELL_SIZE)
+    simMacro.LINKS.push(link)
+
+    // Create FD changer for bottleneck region (cells 14-16, corresponding to micro 70-80)
+    simMacro.FDCHANGERS.push(new MacroFDchanger(link, 14, 16))
+
+    // Create spawner (initial flow 0.2)
+    simMacro.SPAWNERS.push(new MacroSpawner(link, 0.2, 1))
+
+    saveContext(simMacro)
 }
 
 // Load global variables from simulation context

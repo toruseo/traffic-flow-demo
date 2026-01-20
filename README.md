@@ -13,7 +13,7 @@ Access the online versions below, or download this repo and open `bottleneck_min
 
 ## Files
 
-- single-lane model
+- single-lane model (Newell / Nagel-Schreckenberg)
 	- `bottleneck_min.html`: simulator for a bottleneck
 	- `loop_min.html`: simulator for a ring road
 	- `mainloop.js`: code for execution and animation
@@ -22,15 +22,36 @@ Access the online versions below, or download this repo and open `bottleneck_min
 	- `scenario_loop.js`: code defining the ring road scenario
 	- `util.js`: general utility
 
-- multi-lane model
+- multi-lane model (Nagel-Schreckenberg with lane-changing)
 	- `lane_bottleneck_min.html`: simulator for a bottleneck
 	- `lane_mainloop.js`: code for execution and animation
 	- `lane_model.js`: core microscopic traffic-flow logic (car-following, multi-lane, lane-changing, plots)
 	- `lane_scenario_bottleneck.js`: code defining the bottleneck scenario
 	- `lane_util.js`: general utility
 
+- macro model (Cell Transmission Model)
+	- `macro_bottleneck.html`: simulator for a bottleneck using CTM
+	- `macro_mainloop.js`: code for execution and animation
+	- `macro_model.js`: core macroscopic traffic-flow logic (density-based CTM)
+	- `macro_scenario_bottleneck.js`: code defining the bottleneck scenario
+	- `macro.md`: detailed implementation notes
+
+- model comparison
+	- `compare_bottleneck.html`: side-by-side comparison of Meso (Newell), Micro (NaSch), and Macro (CTM) models
+	- `compare_mainloop.js`: code for running three simulations in parallel
+	- `compare_scenario.js`: code initializing all three model types
+
+## Traffic Flow Models
+
+| Model | Type | Description |
+|-------|------|-------------|
+| Newell | Meso | Deterministic car-following, instantaneous acceleration |
+| Nagel-Schreckenberg (NaSch) | Micro | Stochastic cellular automaton with gradual acceleration |
+| Cell Transmission Model (CTM) | Macro | Density-based Godunov scheme, triangular FD |
+
 ## Updates
 
+- 2026-01-20: Added CTM macro model and 3-model comparison (Meso/Micro/Macro)
 - 2026-01-20: Added two-lane bottleneck scenario with lane-changing behavior and per-vehicle desired speeds
 - 2023-08-10: Increased the width of time-space diagram and cumulative plot
 - 2023-07-14: Implemented pause function

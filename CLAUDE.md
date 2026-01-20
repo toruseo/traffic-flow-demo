@@ -22,9 +22,9 @@ To run:
 
 ## Code Architecture
 
-The codebase is organized into two parallel implementations:
+The codebase is organized into three parallel implementations:
 
-### Single-Lane Model
+### Single-Lane Model (Micro/Meso)
 - **HTML Entry**: `bottleneck_min.html`, `loop_min.html`
 - **Core Files**:
   - `model.js` - Vehicle class and Link class implementing traffic flow logic
@@ -32,13 +32,28 @@ The codebase is organized into two parallel implementations:
   - `scenario_bottleneck.js` / `scenario_loop.js` - Scenario initialization (links, spawners, plots)
   - `util.js` - Canvas drawing utilities (draw_rect, draw_circle, draw_line, draw_text)
 
-### Multi-Lane Model
+### Multi-Lane Model (Micro)
 - **HTML Entry**: `lane_bottleneck_min.html`
 - **Core Files**:
   - `lane_model.js` - Enhanced Vehicle class with lane-changing logic and multi-lane Link class
   - `lane_mainloop.js` - Same animation structure as single-lane
   - `lane_scenario_bottleneck.js` - Multi-lane scenario setup
   - `lane_util.js` - Drawing utilities for multi-lane visualization
+
+### Macro Model (CTM)
+- **HTML Entry**: `macro_bottleneck.html`
+- **Core Files**:
+  - `macro_model.js` - MacroLink class implementing Cell Transmission Model (density-based)
+  - `macro_mainloop.js` - Animation loop for CTM
+  - `macro_scenario_bottleneck.js` - Macro scenario setup
+- **Documentation**: `macro.md` - Detailed implementation notes
+
+### Model Comparison
+- **HTML Entry**: `compare_bottleneck.html`
+- **Core Files**:
+  - `compare_scenario.js` - Initializes all three model types (Meso/Micro/Macro)
+  - `compare_mainloop.js` - Runs three simulations in parallel
+- Shows Newell (Meso), NaSch (Micro), and CTM (Macro) side-by-side
 
 ### Key Classes and Responsibilities
 
@@ -80,6 +95,20 @@ The codebase is organized into two parallel implementations:
 - TSplot draws time-space diagrams
 - Cumplot creates cumulative count curves
 
+**MacroLink class** (`macro_model.js`):
+- Represents road segment with CTM (Cell Transmission Model) dynamics
+- Uses larger cells (each macro cell = 5 micro cells) for true macroscopic behavior
+- `density[]` - Continuous density array (vehicles per cell, not binary occupancy)
+- `flow[]` - Cell boundary flow rates
+- `capacity[]` / `kjLocal[]` - Local capacity and jam density for bottlenecks
+- `update()` - Implements Godunov scheme: `n[i](t+1) = n[i](t) + y[i] - y[i+1]`
+- Parameters calibrated to match micro model: `vf=0.8`, `w=0.2`, `kj=5` (per macro cell)
+
+**MacroSpawner / MacroFDchanger** (`macro_model.js`):
+- Analogous to micro model classes but for density-based simulation
+- MacroSpawner sets upstream boundary flow
+- MacroFDchanger reduces capacity/jam density in bottleneck region
+
 ### Animation and Update Loop
 
 The `mainloop.js` / `lane_mainloop.js` files implement a fixed time-step simulation:
@@ -98,17 +127,26 @@ Update sequence:
 
 ### Traffic Flow Models
 
-Two models are selectable via radio buttons:
+Three model types are implemented:
 
-1. **Newell model** (Kinematic Wave Theory):
+1. **Newell model** (Meso - Kinematic Wave Theory):
    - `ACC = 999` (instantaneous acceleration)
    - `DECEL_PROB = 0` (deterministic)
    - Pure car-following with delta-based spacing
+   - Individual vehicles, deterministic behavior
 
-2. **Nagel-Schreckenberg model**:
+2. **Nagel-Schreckenberg model** (Micro):
    - `ACC = 1` (gradual acceleration)
    - `DECEL_PROB > 0` (stochastic randomization)
    - More realistic stop-and-go behavior
+   - Individual vehicles with lane-changing
+
+3. **CTM - Cell Transmission Model** (Macro):
+   - Density-based simulation (no individual vehicles)
+   - Godunov scheme with triangular fundamental diagram
+   - Parameters: `vf=0.8`, `w=0.2`, `kj=5` (calibrated to match micro)
+   - 20 macro cells (each = 5 micro cells)
+   - Deterministic, immediate convergence to steady state
 
 ### Multi-Lane Specific Features
 
@@ -189,3 +227,5 @@ Each HTML file:
 | `bottleneck_min.html` | `model.js` | `mainloop.js` | `scenario_bottleneck.js` | Single-lane bottleneck with spawner |
 | `loop_min.html` | `model.js` | `mainloop.js` | `scenario_loop.js` | Ring road with regulator |
 | `lane_bottleneck_min.html` | `lane_model.js` | `lane_mainloop.js` | `lane_scenario_bottleneck.js` | Multi-lane bottleneck with lane-changing |
+| `macro_bottleneck.html` | `macro_model.js` | `macro_mainloop.js` | `macro_scenario_bottleneck.js` | CTM macro model bottleneck |
+| `compare_bottleneck.html` | `lane_model.js` + `macro_model.js` | `compare_mainloop.js` | `compare_scenario.js` | 3-model comparison (Meso/Micro/Macro) |

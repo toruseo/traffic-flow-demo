@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-    <title>Single-Lane vs Multi-Lane Comparison</title>
+    <title>Micro / Meso / Macro Model Comparison</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -41,11 +41,29 @@
             color: #666;
             margin-bottom: 15px;
         }
+        .legend {
+            margin: 10px 0;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+        .legend-color {
+            width: 16px;
+            height: 10px;
+            margin-right: 4px;
+            border: 1px solid #999;
+        }
     </style>
 </head>
 <body>
-    <h1>Single-Lane vs Multi-Lane Comparison</h1>
-    <p class="description">Compare traffic flow behavior between single-lane (Newell model) and multi-lane (Nagel-Schreckenberg model) simulations</p>
+    <h1>Micro / Meso / Macro Model Comparison</h1>
+    <p class="description">Compare traffic flow behavior between Meso (Newell), Micro (NaSch), and Macro (CTM) models</p>
 
     <div class="controls">
         <div class="control-row">
@@ -65,17 +83,28 @@
     </div>
 
     <div class="canvas-container">
-        <div class="canvas-label">Single-Lane (Newell model: ACC=999, DECEL_PROB=0)</div>
+        <div class="canvas-label">Meso: Single-Lane (Newell model: ACC=999, DECEL_PROB=0)</div>
         <canvas id="canvas_single" width="800" height="120"></canvas>
     </div>
 
     <div class="canvas-container">
-        <div class="canvas-label">Multi-Lane (Nagel-Schreckenberg model: ACC=1, DECEL_PROB=0.2)</div>
+        <div class="canvas-label">Micro: Multi-Lane (Nagel-Schreckenberg model: ACC=1, DECEL_PROB=0.2)</div>
         <canvas id="canvas_multi" width="800" height="140"></canvas>
+    </div>
+
+    <div class="canvas-container">
+        <div class="canvas-label">Macro: CTM (Cell Transmission Model)</div>
+        <canvas id="canvas_macro" width="800" height="120"></canvas>
+        <div class="legend">
+            <span class="legend-item"><span class="legend-color" style="background: hsl(120, 100%, 50%);"></span> Free flow</span>
+            <span class="legend-item"><span class="legend-color" style="background: hsl(60, 100%, 50%);"></span> Medium</span>
+            <span class="legend-item"><span class="legend-color" style="background: hsl(0, 100%, 50%);"></span> Congested</span>
+        </div>
     </div>
 
     <script type="text/javascript" src="util.js"></script>
     <script type="text/javascript" src="lane_model.js"></script>
+    <script type="text/javascript" src="macro_model.js"></script>
     <script type="text/javascript" src="compare_scenario.js"></script>
     <script type="text/javascript" src="compare_mainloop.js"></script>
 
