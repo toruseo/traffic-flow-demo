@@ -76,14 +76,14 @@ function updateSim(sim) {
     }
 
     // Update FD changers based on bottleneck radio buttons
-    var bnNone = document.getElementById("bn_none")
-    if (bnNone != null) {
+    var bnImpact = document.querySelector('input[name="bn_impact"]:checked')
+    if (bnImpact != null) {
         var delta = 1
-        if (document.getElementsByName("bn_impact").item(0).checked) {
+        if (bnImpact.value == "n") {
             delta = 1  // None
-        } else if (document.getElementsByName("bn_impact").item(1).checked) {
+        } else if (bnImpact.value == "l") {
             delta = 2  // Light
-        } else if (document.getElementsByName("bn_impact").item(2).checked) {
+        } else if (bnImpact.value == "h") {
             delta = 4  // Heavy
         }
         for (let fdc of FDCHANGERS) {
@@ -144,7 +144,13 @@ function drawSim(sim) {
 
     // Draw inflow label
     for (let s of SPAWNERS) {
-        s.draw()
+        if (sim === simMulti) {
+            // For multi-lane, display slider value (0~1) instead of actual flow
+            var inflowValue = Number(document.getElementById("inflow").value) / 100
+            draw_text("inflow = " + inflowValue.toFixed(2), s.link.px, s.link.py - 20, "#000000", 12)
+        } else {
+            s.draw()
+        }
     }
 }
 
@@ -158,14 +164,14 @@ function updateMacro(sim) {
     }
 
     // Update FD changers based on bottleneck radio buttons
-    var bnNone = document.getElementById("bn_none")
-    if (bnNone != null) {
+    var bnImpact = document.querySelector('input[name="bn_impact"]:checked')
+    if (bnImpact != null) {
         var delta = 1
-        if (document.getElementsByName("bn_impact").item(0).checked) {
+        if (bnImpact.value == "n") {
             delta = 1  // None
-        } else if (document.getElementsByName("bn_impact").item(1).checked) {
+        } else if (bnImpact.value == "l") {
             delta = 2  // Light
-        } else if (document.getElementsByName("bn_impact").item(2).checked) {
+        } else if (bnImpact.value == "h") {
             delta = 4  // Heavy
         }
         for (let fdc of FDCHANGERS) {
