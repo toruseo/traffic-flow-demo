@@ -38,11 +38,8 @@ class MacroLink {
         this.density = init_array(xmax, 0)      // Density array (vehicles/cell)
         this.flow = init_array(xmax + 1, 0)     // Cell boundary flow (vehicles/step)
 
-        // Bottleneck capacity array (qmax at each cell)
+        // Bottleneck capacity array (qmax at each cell, reduced by bottlenecks)
         this.capacity = init_array(xmax, this.qmax)
-
-        // Local jam density (for bottleneck)
-        this.kjLocal = init_array(xmax, this.kj)
 
         // Delta array for bottleneck display (matching micro model interface)
         this.delta = init_array(xmax, delta)
@@ -66,7 +63,6 @@ class MacroLink {
                 S = this.flow[0]  // Set by spawner
             } else {
                 let k = this.density[i - 1]
-                let kjL = this.kjLocal[i - 1]
                 let capL = this.capacity[i - 1]
                 // Supply = min(k * vf, qmax_local)
                 // In free flow: S = k * vf
@@ -81,12 +77,11 @@ class MacroLink {
                 R = this.qmax
             } else {
                 let k = this.density[i]
-                let kjL = this.kjLocal[i]
                 let capL = this.capacity[i]
-                // Receive = min(w * (kj_local - k), qmax_local)
+                // Receive = min(w * (kj - k), qmax_local)
                 // In free flow: R = qmax
                 // In congestion: R = w * (kj - k)
-                R = Math.min(this.w * (kjL - k), capL)
+                R = Math.min(this.w * (this.kj - k), capL)
                 if (R < 0) R = 0
             }
 
@@ -108,13 +103,13 @@ class MacroLink {
             newDensity[i] = this.density[i] + this.flow[i] - this.flow[i + 1]
             // Clamp density to valid range
             if (newDensity[i] < 0) newDensity[i] = 0
-            if (newDensity[i] > this.kjLocal[i]) newDensity[i] = this.kjLocal[i]
+            if (newDensity[i] > this.kj) newDensity[i] = this.kj
         }
         this.density = newDensity
     }
 
     /**
-     * Set bottleneck by reducing local capacity and jam density
+     * Set bottleneck by reducing local capacity
      * deltaValue: 1 = no bottleneck, 2 = light, 4 = heavy
      */
     set_bottleneck(x0, x1, deltaValue) {
@@ -124,8 +119,13 @@ class MacroLink {
 
         for (let x = x0; x < x1; x++) {
             if (x >= 0 && x < this.xmax) {
-                this.capacity[x] = this.qmax * ratio
-                this.kjLocal[x] = this.kj * ratio
+                if (deltaValue == 1){
+                    this.capacity[x] = this.qmax
+                } else if (deltaValue == 2){
+                    this.capacity[x] = this.qmax * (2/3)/0.8
+                } else if (deltaValue == 4){
+                    this.capacity[x] = this.qmax * 0.5/0.8
+                }
                 this.delta[x] = deltaValue
             }
         }
@@ -137,7 +137,6 @@ class MacroLink {
     reset_bottleneck() {
         for (let x = 0; x < this.xmax; x++) {
             this.capacity[x] = this.qmax
-            this.kjLocal[x] = this.kj
             this.delta[x] = this.delta_default
         }
     }
@@ -178,7 +177,7 @@ class MacroLink {
 
         // Draw density as color gradient
         // Use global kj and kc for consistent coloring across all cells (including bottleneck)
-        let kcRatio = this.kc / this.kj  // Global critical density ratio (~0.2)
+        let kcRatio = this.kc / this.kj*1.01  // Global critical density ratio (~0.2)
 
         for (let i = 0; i < this.xmax; i++) {
             let k = this.density[i]
@@ -202,7 +201,7 @@ class MacroLink {
                 CTX.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`
             } else {
                 // Congested (above critical density): yellow -> orange -> red
-                let r = (ratio - kcRatio) / (1 - kcRatio)
+                let r = Math.min((ratio*1.5 - kcRatio) / (1 - kcRatio), 1)
                 let hue = 60 - r * 60  // yellow(60) -> red(0)
                 let saturation = 90 + r * 10   // 90% -> 100%
                 let lightness = 55 - r * 15    // 55% -> 40%
