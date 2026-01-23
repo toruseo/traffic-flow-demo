@@ -124,7 +124,8 @@ function initMultiLane() {
     loadContext(simMulti)
 
     // Create link with 2 lanes
-    var link = new Link(100, 1, 100, 50, 600, 0, 2)
+    var link = new Link(100, 2, 100, 50, 600, 0, 2) //single-laneのときdelta=1なので，道路としてのjam densityをそろえるためにdelta=2
+    //var link = new Link(100, 1, 100, 50, 600, 0, 2)
     link.set_delta(70, 80, 2)
     simMulti.LINKS.push(link)
 
