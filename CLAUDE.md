@@ -102,14 +102,14 @@ The codebase is organized into three parallel implementations:
 - Uses larger cells (each macro cell = 5 micro cells) for true macroscopic behavior
 - `density[]` - Continuous density array (vehicles per cell, not binary occupancy)
 - `flow[]` - Cell boundary flow rates
-- `capacity[]` / `kjLocal[]` - Local capacity and jam density for bottlenecks
+- `capacity[]` - Local capacity for bottlenecks (defaults to `qmax`, reduced by `set_bottleneck`)
 - `update()` - Implements Godunov scheme: `n[i](t+1) = n[i](t) + y[i] - y[i+1]`
 - Parameters calibrated to match micro model: `vf=0.8`, `w=0.2`, `kj=5` (per macro cell)
 
 **MacroSpawner / MacroFDchanger** (`macro_model.js`):
 - Analogous to micro model classes but for density-based simulation
 - MacroSpawner sets upstream boundary flow
-- MacroFDchanger reduces capacity/jam density in bottleneck region
+- MacroFDchanger reduces capacity in bottleneck region
 
 ### Animation and Update Loop
 
