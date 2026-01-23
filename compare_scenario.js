@@ -71,7 +71,7 @@ var simMulti = {
     ACC: 1,          // Nagel-Schreckenberg model: gradual acceleration
     DECEL_PROB: 0.2, // Nagel-Schreckenberg model: stochastic deceleration
     NUM_LANES: 2,
-    INFLOW_COEF: 2   // Inflow coefficient for multi-lane (adjustable)
+    INFLOW_COEF: 1.5   // Inflow coefficient for multi-lane (adjustable)
 };
 
 // Macro simulation state (CTM model)
