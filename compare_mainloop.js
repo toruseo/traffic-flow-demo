@@ -200,6 +200,68 @@ function drawMacro(sim) {
     for (let s of SPAWNERS) {
         s.draw()
     }
+
+    // Draw colorbar inside canvas (centered at bottom)
+    if (LINKS.length > 0) {
+        var link = LINKS[0]
+        var barW = 200
+        var barH = 10
+        var barX = (CANVAS.width - barW) / 2
+        var barY = CANVAS.height - 28
+        var kcRatio = link.kc / link.kj * 1.01
+
+        // Draw gradient bar
+        for (let i = 0; i < barW; i++) {
+            let ratio = i / barW
+            if (ratio < 0.01) {
+                CTX.fillStyle = "#ffffff"
+            } else if (ratio < kcRatio) {
+                let r = (ratio - 0.01) / (kcRatio - 0.01)
+                let hue = 120
+                let saturation = 20 + r * 60
+                let lightness = 90 - r * 40
+                CTX.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`
+            } else {
+                let r = Math.min((ratio * 1.5 - kcRatio) / (1 - kcRatio), 1)
+                let hue = 60 - r * 60
+                let saturation = 90 + r * 10
+                let lightness = 55 - r * 15
+                CTX.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`
+            }
+            CTX.fillRect(barX + i, barY, 1, barH)
+        }
+
+        // Draw border
+        CTX.strokeStyle = "#999999"
+        CTX.lineWidth = 1
+        CTX.strokeRect(barX, barY, barW, barH)
+
+        // Draw critical density marker
+        var kcX = barX + kcRatio * barW
+        CTX.strokeStyle = "#333333"
+        CTX.lineWidth = 1
+        CTX.beginPath()
+        CTX.moveTo(kcX, barY - 2)
+        CTX.lineTo(kcX, barY + barH + 2)
+        CTX.stroke()
+
+        // Labels
+        var barMidY = barY + barH / 2
+        CTX.fillStyle = "#000000"
+        CTX.font = "11px sans-serif"
+        CTX.textBaseline = "middle"
+        CTX.textAlign = "right"
+        CTX.fillText("Empty", barX - 6, barMidY)
+        CTX.textAlign = "left"
+        CTX.fillText("Jam", barX + barW + 6, barMidY)
+        CTX.textBaseline = "top"
+        CTX.textAlign = "center"
+        CTX.fillText("Density", barX + barW / 2, barY + barH + 3)
+        CTX.font = "10px sans-serif"
+        CTX.textBaseline = "alphabetic"
+        CTX.fillText("Critical density", kcX, barY - 5)
+        CTX.textAlign = "left"  // reset
+    }
 }
 
 print("compare_mainloop.js END");
