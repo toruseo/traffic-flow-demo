@@ -65,30 +65,14 @@
     <h1>Micro / Meso / Macro Model Comparison</h1>
     <p class="description">Compare traffic flow behavior between Meso (Newell), Micro (NaSch), and Macro (CTM) models</p>
 
-    <div class="controls">
-        <div class="control-row">
-            <label>Inflow:</label>
-            <input id="inflow" type="range" min="0" max="100" step="1" value="20">
-            <span id="inflow_value">0.20</span>
-        </div>
-        <div class="control-row">
-            <label>Bottleneck:</label>
-            <label><input id="bn_none" type="radio" name="bn_impact" value="n"> No</label>
-            <label><input id="bn_heavy" type="radio" name="bn_impact" value="h" checked> Yes</label>
-        </div>
-        <div class="control-row">
-            <button id="pauseButton">Pause / Resume</button>
-        </div>
+    <div class="canvas-container">
+        <div class="canvas-label">Micro: Multi-Lane (Nagel-Schreckenberg model: ACC=1, DECEL_PROB=0.2)</div>
+        <canvas id="canvas_multi" width="800" height="140"></canvas>
     </div>
 
     <div class="canvas-container">
         <div class="canvas-label">Meso: Single-Lane (Newell model: ACC=999, DECEL_PROB=0)</div>
         <canvas id="canvas_single" width="800" height="120"></canvas>
-    </div>
-
-    <div class="canvas-container">
-        <div class="canvas-label">Micro: Multi-Lane (Nagel-Schreckenberg model: ACC=1, DECEL_PROB=0.2)</div>
-        <canvas id="canvas_multi" width="800" height="140"></canvas>
     </div>
 
     <div class="canvas-container">
@@ -115,6 +99,22 @@
                 </div>
                 <span style="font-size: 10px;">Jam</span>
             </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="control-row">
+            <label>Inflow:</label>
+            <input id="inflow" type="range" min="0" max="100" step="1" value="20">
+            <span id="inflow_value">0.20</span>
+        </div>
+        <div class="control-row">
+            <label>Bottleneck:</label>
+            <label><input id="bn_none" type="radio" name="bn_impact" value="n"> No</label>
+            <label><input id="bn_heavy" type="radio" name="bn_impact" value="h" checked> Yes</label>
+        </div>
+        <div class="control-row">
+            <button id="pauseButton">Pause / Resume</button>
         </div>
     </div>
 

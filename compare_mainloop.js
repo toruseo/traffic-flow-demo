@@ -13,7 +13,6 @@ window.onload = function() {
     // Toggle pause when the pause button is clicked
     document.getElementById('pauseButton').addEventListener('click', function() {
         isPaused = !isPaused
-        this.textContent = isPaused ? 'Resume' : 'Pause / Resume'
     })
 
     // Start the main loop
