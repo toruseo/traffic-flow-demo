@@ -385,7 +385,7 @@ class Link{
     }
 
     draw_trafficstate(){
-        var py0 = 40
+        var py0 = this.pw + this.pew + 16
         var pdy = 18
         var pdx = 1/this.deltaxsize*this.plen
         var pad = -2
